@@ -1,11 +1,18 @@
 import express from 'express';
+import mongoose from 'mongoose';
+import routes from './routes';
 
-const app = express();
+const server = express();
 
-app.get('/', (request, response) => {
-  return response.json({ message: 'Hello World from express.' });
+mongoose.connect('mongodb+srv://omnistack:omnistack@omnistack-weeks.aiqhn.mongodb.net/omnistack-week-8-tindev?retryWrites=true&w=majority', {
+  useFindAndModify: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
-app.listen(8888, () => {
+server.use(express.json());
+server.use(routes);
+
+server.listen(8888, () => {
   console.log('Server started on port 8888!');
 });
