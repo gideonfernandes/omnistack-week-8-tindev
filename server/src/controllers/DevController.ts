@@ -3,6 +3,22 @@ import axios from 'axios';
 import Dev from '../models/Dev';
 
 export default {
+  async index(request: Request, response: Response) {
+    const { user } = request.headers;
+
+    const loggedDev: any = await Dev.findById(user);
+
+    const devs = await Dev.find({
+      $and: [
+        { _id: { $ne: user } },
+        { _id: { $nin: loggedDev.likes } },
+        { _id: { $nin: loggedDev.dislikes } },
+      ],
+    });
+
+    return response.json(devs);
+  },
+
   async store(request: Request, response: Response) {
     const { username } = request.body;
 
@@ -26,5 +42,5 @@ export default {
     });
 
     return response.json(dev);
-  }
+  },
 };
