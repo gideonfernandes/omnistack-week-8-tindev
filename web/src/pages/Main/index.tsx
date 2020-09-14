@@ -1,10 +1,88 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 
 import './Main.css';
+import logo from '../../assets/logo.svg';
+import like from '../../assets/like.svg';
+import dislike from '../../assets/dislike.svg';
+
+import api from '../../services/api';
+
+interface User {
+  _id: string;
+  name: string;
+  avatar?: string;
+  bio?: string;
+}
 
 const Main: React.FC = () => {
+  const params: any = useParams();
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    async function loadUsers() {
+      const response = await api.get('/devs', {
+        headers: {
+          user: params.id,
+        },
+      });
+
+      setUsers(response.data);
+    };
+
+    loadUsers();
+  }, [params.id]);
+
+  const handleLike = async (id: string) => {
+    await api.post(`devs/${id}/likes`, null, {
+      headers: {
+        user: params.id,
+      },
+    });
+
+    setUsers(users.filter((user: User) => user._id !== id));
+  };
+
+  const handleDislike = async (id: string) => {
+    await api.post(`devs/${id}/dislikes`, null, {
+      headers: {
+        user: params.id,
+      },
+    });
+
+    setUsers(users.filter((user: User) => user._id !== id));
+  };
+
   return (
-    <h1>Main</h1>
+    <div className="main-container">
+      <img src={logo} alt="TIndev Logo"/>
+      {users.length > 0 ? (
+        <ul>
+          {users.map((user: User) => (
+            <li key={user._id}>
+              <Link to='/'>
+                <img src={user.avatar} alt={user.name} />
+              </Link>
+              <footer>
+                <strong>{user.name}</strong>
+                <p>{user.bio}</p>
+              </footer>
+
+              <div className="buttons">
+                <button type="button" onClick={() => handleLike(user._id)}>
+                  <img src={like} alt="Like"/>
+                </button>
+                <button type="button" onClick={() => handleDislike(user._id)}>
+                  <img src={dislike} alt="Dislike"/>
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="empty">Acabou :(</div>
+      )}
+    </div>
   );
 }
 
