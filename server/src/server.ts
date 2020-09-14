@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import cors from 'cors';
 import routes from './routes';
 
 const server = express();
@@ -10,6 +11,7 @@ mongoose.connect('mongodb+srv://omnistack:omnistack@omnistack-weeks.aiqhn.mongod
   useUnifiedTopology: true,
 });
 
+server.use(cors());
 server.use(express.json());
 server.use(routes);
 
